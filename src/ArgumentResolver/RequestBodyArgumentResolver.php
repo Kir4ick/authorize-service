@@ -5,10 +5,12 @@ namespace App\ArgumentResolver;
 use App\Attribute\RequestBody;
 use App\Exception\RequestBodyConvertException;
 use App\Exception\ValidationException;
+use Error;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Throwable;
@@ -37,8 +39,8 @@ class RequestBodyArgumentResolver implements ValueResolverInterface
             $model = $this->serializer->deserialize(
                 $request->getContent(), $argument->getType(), JsonEncoder::FORMAT
             );
-        } catch (Throwable $throwable) {
-            throw new RequestBodyConvertException($throwable);
+        } catch (NotEncodableValueException $throwable) {
+            throw new RequestBodyConvertException($throwable->getMessage());
         }
 
         $errors = $this->validator->validate($model);
