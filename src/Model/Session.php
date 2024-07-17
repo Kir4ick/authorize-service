@@ -2,7 +2,7 @@
 
 namespace App\Model;
 
-use App\Repository\UserRepository;
+use App\Repository\User\UserRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
