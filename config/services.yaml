@@ -7,6 +7,8 @@ parameters:
     exceptions:
         App\Exception\RequestBodyConvertException: { code: 400 }
 
+    refresh_ttl: '%env(REFRESH_TTL)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -26,6 +28,11 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Service\ExceptionHandler\ExceptionMappingResolver:
         arguments: ['%exceptions%']
+
+    App\Listener\JWTCreatedListener:
+        arguments: [ '@request_stack', '%refresh_ttl%' ]
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created }
 
     App\Listener\ExceptionListener:
         tags:

@@ -2,22 +2,26 @@
 
 namespace App\Service\Auth\Data;
 
-use App\Entity\User;
-
 class LoginOutput
 {
-    private User $user;
+    private string $accessToken;
 
-    /**
-     * @param User $user
-     */
-    public function __construct(User $user)
+    private string $refreshToken;
+
+    public function __construct(string $accessToken, string $refreshToken)
     {
-        $this->user = $user;
+        $this->accessToken = $accessToken;
+        $this->refreshToken = $refreshToken;
     }
 
-    public function getUser(): User
+    public function getRefreshToken(): string
     {
-        return $this->user;
+        return $this->refreshToken;
     }
+
+    public function getAccessToken(): string
+    {
+        return $this->accessToken;
+    }
+
 }

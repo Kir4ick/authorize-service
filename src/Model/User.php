@@ -9,7 +9,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
+#[ORM\Table(
+    name: '`user`',
+    indexes: [
+        new ORM\Index('login_idx', ['login'], flags: ['fulltext'])
+    ]
+)]
 #[ORM\HasLifecycleCallbacks]
 class User
 {
@@ -22,7 +27,7 @@ class User
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     protected ?string $uuid = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     protected ?string $login = null;
 
     #[ORM\Column(length: 255)]
@@ -31,11 +36,11 @@ class User
     #[ORM\Column(type: 'datetimetz', nullable: true)]
     protected ?DateTimeInterface $deletedAt;
 
-    #[ORM\OneToOne(self::class, inversedBy: 'deleted_by')]
+    #[ORM\OneToOne(self::class)]
     #[ORM\JoinColumn('deleted_by', referencedColumnName: 'uuid')]
     protected ?User $deletedBy;
 
-    #[ORM\OneToOne(self::class, inversedBy: 'updated_by')]
+    #[ORM\OneToOne(self::class)]
     #[ORM\JoinColumn('updated_by', referencedColumnName: 'uuid')]
     protected ?User $updatedBy;
 

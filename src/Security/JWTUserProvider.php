@@ -14,8 +14,7 @@ class JWTUserProvider implements PayloadAwareUserProviderInterface
 
     public function __construct(
         private readonly UserServiceInterface $userService
-    )
-    {}
+    ) {}
 
     /**
      * @deprecated
@@ -47,7 +46,7 @@ class JWTUserProvider implements PayloadAwareUserProviderInterface
 
     public function loadUserByIdentifierAndPayload(string $identifier, array $payload): UserInterface
     {
-
+        return $this->loadUserByIdentifier($identifier);
     }
 
 }

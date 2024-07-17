@@ -8,6 +8,7 @@ use App\Service\Session\Data\CreateSessionInput;
 use App\Service\Session\SessionServiceInterface;
 use App\Service\User\Data\GetUserInput;
 use App\Service\User\UserServiceInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -18,7 +19,8 @@ class AuthService implements AuthServiceInterface
     public function __construct(
         private readonly UserServiceInterface $userService,
         private readonly SessionServiceInterface $sessionService,
-        private readonly UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly JWTTokenManagerInterface $JWTManager
     )
     {}
 
@@ -33,6 +35,13 @@ class AuthService implements AuthServiceInterface
             throw new UnauthorizedHttpException('Password not equal');
         }
 
+        $accessToken = $this->JWTManager->createFromPayload($result->getUser(), [
+            'access' => true
+        ]);
+
+        $refreshToken = $this->JWTManager->createFromPayload($result->getUser(), [
+            'refresh' => true
+        ]);
         //$createdResult = $this->sessionService->createSession(
         //    new CreateSessionInput($input->getFingerprint(), $result->getUser()->getUUID())
         //);
@@ -42,6 +51,6 @@ class AuthService implements AuthServiceInterface
 
         //$result->getUser()->setSession($createdResult->getSession());
 
-        return new LoginOutput($result->getUser());
+        return new LoginOutput($accessToken, $refreshToken);
     }
 }

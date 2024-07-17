@@ -25,8 +25,10 @@ class UserService implements UserServiceInterface
     {
         $filters = $this->clearEmptyValues([
            'uuid' => $input->getUuid(),
-           'login' => $input->getLogin()
+           'login' => $input->getLogin(),
         ]);
+
+        $filters['deletedBy'] = null;
 
         /** @var User|null $user */
         $user = $this->userRepository->findOneBy($filters);

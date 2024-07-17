@@ -20,8 +20,7 @@ class UserFixture extends Fixture
         $password = $this->passwordHasher
             ->hashPassword(new \App\Entity\User(), 'GhI89ZZ0-');
 
-        $user = new User();
-        $user
+        $user = (new User())
             ->setLogin('kir4ick')
             ->setPassword($password);
 

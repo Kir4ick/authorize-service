@@ -29,9 +29,11 @@ class AuthController extends AbstractController
             $request->getLogin(), $request->getPassword(), $request->getFingerprint()
         );
 
-        $user = $this->authService->login($input);
+        $loginResult = $this->authService->login($input);
 
-        return $this->successHandler->handleAuthenticationSuccess($user->getUser());
+        return $this->json(
+            new LoginResponse($loginResult->getAccessToken(), $loginResult->getRefreshToken())
+        );
     }
 
 }
