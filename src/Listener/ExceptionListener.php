@@ -25,8 +25,6 @@ class ExceptionListener
     {
         $throwable = $event->getThrowable();
 
-        var_dump($throwable::class);
-
         $exceptionModel = $this->exceptionMappingResolver->resolve($throwable);
         if ($exceptionModel === null) {
             $exceptionModel = $this->exceptionMappingResolver::fromCode(
