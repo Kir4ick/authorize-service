@@ -4,10 +4,11 @@ namespace App\Repository\User;
 
 use App\Entity\User as UserEntity;
 use App\Model\User;
+use App\Repository\AbstractRepository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class UserRepository extends ServiceEntityRepository implements UserRepositoryInterface
+class UserRepository extends AbstractRepository implements UserRepositoryInterface
 {
     public function __construct(ManagerRegistry $registry)
     {
@@ -18,24 +19,28 @@ class UserRepository extends ServiceEntityRepository implements UserRepositoryIn
     {
         $result = parent::findOneBy($criteria, $orderBy);
 
-        return $this->mapModelToEntity($result);
+        return $this->mapToEntity($result);
     }
 
-    private function mapModelToEntity(?User $user): ?UserEntity
+    /**
+     * @param User|null $map
+     * @return UserEntity|null
+     */
+    protected function mapToEntity(?object $map): ?UserEntity
     {
-        if ($user === null) {
+        if ($map === null) {
             return null;
         }
 
         $userEntity = new UserEntity();
         return $userEntity
-            ->setUUID($user->getUUID())
-            ->setLogin($user->getLogin())
-            ->setPassword($user->getPassword())
-            ->setDeletedAt($user->getDeletedAt())
-            ->setDeletedBy($user->getDeletedBy())
-            ->setCreatedAt($user->getCreatedAt())
-            ->setUpdatedAt($user->getUpdatedAt());
+            ->setUUID($map->getUUID())
+            ->setLogin($map->getLogin())
+            ->setPassword($map->getPassword())
+            ->setDeletedAt($map->getDeletedAt())
+            ->setDeletedBy($map->getDeletedBy())
+            ->setCreatedAt($map->getCreatedAt())
+            ->setUpdatedAt($map->getUpdatedAt());
     }
 
 }
