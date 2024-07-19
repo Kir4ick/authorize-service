@@ -2,42 +2,47 @@
 
 namespace App\Model;
 
-use App\Repository\UserRepository;
-use App\Traits\TimestampTrait;
+use App\Repository\User\UserRepository;
+use App\Traits\Timestamp;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
+#[ORM\Table(
+    name: '`user`',
+    indexes: [
+        new ORM\Index('login_idx', ['login'], flags: ['fulltext'])
+    ]
+)]
+#[ORM\HasLifecycleCallbacks]
 class User
 {
 
-    use TimestampTrait;
+    use Timestamp;
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?string $uuid = null;
+    protected ?string $uuid = null;
+
+    #[ORM\Column(length: 255, unique: true)]
+    protected ?string $login = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $login = null;
+    protected ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $password = null;
+    #[ORM\Column(type: 'datetimetz', nullable: true)]
+    protected ?DateTimeInterface $deletedAt;
 
-    #[ORM\Column(type: 'datetimetz')]
-    private ?DateTimeInterface $deletedAt;
-
-    #[ORM\OneToOne(self::class, inversedBy: 'deleted_by')]
+    #[ORM\OneToOne(self::class)]
     #[ORM\JoinColumn('deleted_by', referencedColumnName: 'uuid')]
-    private ?User $deletedBy;
+    protected ?User $deletedBy;
 
-    #[ORM\OneToOne(self::class, inversedBy: 'updated_by')]
+    #[ORM\OneToOne(self::class)]
     #[ORM\JoinColumn('updated_by', referencedColumnName: 'uuid')]
-    private ?User $updatedBy;
-
+    protected ?User $updatedBy;
 
     public function getUUID(): ?string
     {
@@ -73,9 +78,11 @@ class User
         return $this->deletedBy;
     }
 
-    public function setDeletedBy(?User $deletedBy): void
+    public function setDeletedBy(?User $deletedBy): static
     {
         $this->deletedBy = $deletedBy;
+
+        return $this;
     }
 
     public function getDeletedAt(): ?DateTimeInterface
@@ -83,9 +90,11 @@ class User
         return $this->deletedAt;
     }
 
-    public function setDeletedAt(?DateTimeInterface $deletedAt): void
+    public function setDeletedAt(?DateTimeInterface $deletedAt): static
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
     }
 
     public function getUpdatedBy(): ?User
@@ -93,8 +102,15 @@ class User
         return $this->updatedBy;
     }
 
-    public function setUpdatedBy(?User $updatedBy): void
+    public function setUpdatedBy(?User $updatedBy): static
     {
         $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getUUID();
     }
 }

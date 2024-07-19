@@ -36,6 +36,8 @@ class ValidationExceptionListener
             JsonEncoder::FORMAT
         );
 
-        $event->setResponse(new JsonResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, json: true));
+        $event->setResponse(
+            new JsonResponse($data, Response::HTTP_UNPROCESSABLE_ENTITY, json: true)
+        );
     }
 }

@@ -12,7 +12,6 @@ class ExceptionMappingResolver implements ExceptionMappingResolverInterface
 
     public function __construct(array $exceptions)
     {
-        var_dump($exceptions);
         foreach ($exceptions as $class => $exception) {
             if (!isset($exception['code'])) {
                 throw new \InvalidArgumentException('code is not be blank');

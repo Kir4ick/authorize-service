@@ -2,11 +2,14 @@
 
 namespace App\Service\Session;
 
-use App\Service\Session\Data\CreateSessionInput;
-use App\Service\Session\Data\CreateSessionOutput;
+use App\Service\Session\Data\UpsertSessionInput;
+use App\Service\Session\Data\UpsertSessionOutput;
+use App\Service\Session\Data\GetSessionInput;
+use App\Service\Session\Data\GetSessionOutput;
 
 interface SessionServiceInterface
 {
-    public function createSession(CreateSessionInput $input): CreateSessionOutput;
+    public function upsertSession(UpsertSessionInput $input): UpsertSessionOutput;
 
+    public function getSession(GetSessionInput $input): GetSessionOutput;
 }
