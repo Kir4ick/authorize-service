@@ -2,40 +2,47 @@
 
 namespace App\Model;
 
-use App\Repository\UserRepository;
-use DateTime;
+use App\Repository\User\UserRepository;
+use App\Traits\Timestamp;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Validator\Constraints\Cascade;
 
 #[ORM\Embeddable]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`session`')]
+#[ORM\HasLifecycleCallbacks]
 class Session
 {
+
+    use Timestamp;
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?string $uuid = null;
+    protected ?string $uuid = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $fingerprint = null;
+    #[ORM\Column(type: 'text')]
+    protected ?string $fingerprint = null;
 
-    #[ORM\Column(type: 'datetimetz')]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(type: 'text')]
+    protected ?string $userAgent = null;
 
-    #[ORM\Column(type: 'datetimetz')]
-    private ?\DateTimeInterface $updatedAt = null;
+    #[ORM\Column(type: 'boolean')]
+    protected ?bool $isActive = null;
 
-    #[ORM\Column(type: 'datetimetz')]
-    private ?\DateTimeInterface $expiredAt = null;
+    #[ORM\Column(type: 'boolean')]
+    protected ?bool $isBlocked = null;
 
-    #[ORM\ManyToOne(User::class, inversedBy: 'user_uuid')]
+    #[ORM\Column(type: 'text')]
+    protected ?string $ip = null;
+
+    #[ORM\ManyToOne(User::class, cascade: ['persist'])]
     #[ORM\JoinColumn('user_uuid', referencedColumnName: 'uuid')]
-    private ?User $user;
+    protected ?User $user;
 
-    public function getUuid(): ?string
+    public function getUUID(): ?string
     {
         return $this->uuid;
     }
@@ -45,39 +52,69 @@ class Session
         return $this->fingerprint;
     }
 
-    public function setFingerprint(string $fingerprint): void
+    public function setFingerprint(?string $fingerprint): Session
     {
         $this->fingerprint = $fingerprint;
+        return $this;
     }
 
-    public function getCreatedAt(): ?DateTime
+    public function getUserAgent(): ?string
     {
-        return $this->createdAt;
+        return $this->userAgent;
     }
 
-    public function setCreatedAt(?DateTime $createdAt): void
+    public function setUserAgent(?string $userAgent): Session
     {
-        $this->createdAt = $createdAt;
+        $this->userAgent = $userAgent;
+        return $this;
     }
 
-    public function getUpdatedAt(): ?DateTime
+    public function getIsActive(): ?bool
     {
-        return $this->updatedAt;
+        return $this->isActive;
     }
 
-    public function setUpdatedAt(?DateTime $updatedAt): void
+    public function setIsActive(?bool $isActive): Session
     {
-        $this->updatedAt = $updatedAt;
+        $this->isActive = $isActive;
+        return $this;
     }
 
-    public function getExpiredAt(): ?DateTime
+    public function getIsBlocked(): ?bool
     {
-        return $this->expiredAt;
+        return $this->isBlocked;
     }
 
-    public function setExpiredAt(?DateTime $expiredAt): void
+    public function setIsBlocked(?bool $isBlocked): Session
     {
-        $this->expiredAt = $expiredAt;
+        $this->isBlocked = $isBlocked;
+        return $this;
     }
 
+    public function getIp(): ?string
+    {
+        return $this->ip;
+    }
+
+    public function setIp(?string $ip): Session
+    {
+        $this->ip = $ip;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): Session
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getUUID();
+    }
 }
